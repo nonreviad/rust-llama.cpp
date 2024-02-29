@@ -63,7 +63,8 @@ int get_embeddings(void *params_ptr, void *state_pr, float *res_embeddings)
 
     std::mt19937 rng(params_p->seed);
 
-    llama_backend_init(params_p->numa);
+    llama_backend_init();
+    llama_numa_init(params_p->numa);
 
     int n_past = 0;
 
@@ -753,7 +754,10 @@ void *load_model(const char *fname, int n_ctx, int n_seed, bool memory_f16, bool
     if (n_batch > 0)
         lparams.n_batch = n_batch;
 
-    llama_backend_init(numa);
+    llama_backend_init();
+    if (!numa) {
+        llama_numa_init(ggml_numa_strategy::GGML_NUMA_STRATEGY_DISABLED);
+    }
     void *res = nullptr;
     try
     {
