@@ -79,7 +79,7 @@ int get_embeddings(void *params_ptr, void *state_pr, float *res_embeddings)
 
     if (embd_inp.size() > 0)
     {
-        if (llama_eval(ctx, embd_inp.data(), embd_inp.size(), n_past))
+        if (llama_decode(ctx, llama_batch_get_one(embd_inp.data(), embd_inp.size(), n_past, 0)))
         {
             fprintf(stderr, "%s : failed to eval\n", __func__);
             return 1;
@@ -135,9 +135,8 @@ int eval(void *params_ptr, void *state_pr, char *text)
         fprintf(stderr, "%s : failed to tokenize prompt\n", __func__);
         return 1;
     }
-
     // evaluate prompt
-    return llama_eval(ctx, tokens.data(), n_prompt_tokens, n_past);
+    return llama_decode(ctx, llama_batch_get_one(tokens.data(), n_prompt_tokens, n_past, 0));
 }
 
 int llama_predict(void *params_ptr, void *state_pr, char **result, bool debug)
@@ -281,7 +280,7 @@ int llama_predict(void *params_ptr, void *state_pr, char **result, bool debug)
         llama_token tmp[1] = {
             llama_token_bos(llama_get_model(ctx)),
         };
-        llama_eval(ctx, tmp, 1, 0);
+        llama_decode(ctx, llama_batch_get_one(tmp, 1, 0,0 ));
         llama_reset_timings(ctx);
     }
 
@@ -352,7 +351,7 @@ int llama_predict(void *params_ptr, void *state_pr, char **result, bool debug)
                 {
                     n_eval = params_p->n_batch;
                 }
-                if (llama_eval(ctx, &embd[i], n_eval, n_past))
+                if (llama_decode(ctx, llama_batch_get_one(&embd[i], n_eval, n_past, 0)))
                 {
                     fprintf(stderr, "%s : failed to eval\n", __func__);
                     return 1;
