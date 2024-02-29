@@ -657,9 +657,9 @@ void *llama_allocate_params(const char *prompt, int seed, int threads, int token
         const std::regex regex{R"([,/]+)"};
         std::sregex_token_iterator it{arg_next.begin(), arg_next.end(), regex, -1};
         std::vector<std::string> split_arg{it, {}};
-        GGML_ASSERT(split_arg.size() <= LLAMA_MAX_DEVICES);
+        GGML_ASSERT(split_arg.size() <= llama_max_devices());
 
-        for (size_t i = 0; i < LLAMA_MAX_DEVICES; ++i)
+        for (size_t i = 0; i < llama_max_devices(); ++i)
         {
             if (i < split_arg.size())
             {
@@ -733,11 +733,11 @@ void *load_model(const char *fname, int n_ctx, int n_seed, bool memory_f16, bool
         const std::regex regex{R"([,/]+)"};
         std::sregex_token_iterator it{arg_next.begin(), arg_next.end(), regex, -1};
         std::vector<std::string> split_arg{it, {}};
-        GGML_ASSERT(split_arg.size() <= LLAMA_MAX_DEVICES);
+        GGML_ASSERT(split_arg.size() <= llama_max_devices());
 
-	float *tsplit = (float*)malloc(sizeof(float) * LLAMA_MAX_DEVICES);
+	float *tsplit = (float*)malloc(sizeof(float) * llama_max_devices());
 
-        for (size_t i = 0; i < LLAMA_MAX_DEVICES; ++i)
+        for (size_t i = 0; i < llama_max_devices(); ++i)
         {
             if (i < split_arg.size())
             {
